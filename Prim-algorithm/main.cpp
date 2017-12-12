@@ -2,8 +2,6 @@
 //  main.cpp
 //  Prim's algorithm
 //
-//  Created by Александр Кисляков on 22.07.17.
-//  Copyright © 2017 Александр Кисляков. All rights reserved.
 //
 
 /*

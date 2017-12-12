@@ -2,8 +2,6 @@
 //  main.cpp
 //  Dijkstra
 //
-//  Created by Александр Кисляков on 21.07.17.
-//  Copyright © 2017 Александр Кисляков. All rights reserved.
 //
 
 /*

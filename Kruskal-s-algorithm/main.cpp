@@ -2,8 +2,6 @@
 //  main.cpp
 //  kruskal's algorithm
 //
-//  Created by Александр Кисляков;
-//  Copyright © 2017 Александр Кисляков. All rights reserved.
 //
 
 /*
