@@ -18,7 +18,7 @@ class VectorList {
     VectorList(VectorList const &) = default;
     VectorList(VectorList &&) = default;
 
-    VectorList & operator=(VectorList &&)     = default;
+    VectorList & operator=(VectorList &&) = default;
     VectorList & operator=(VectorList const &) = default;
 
     class const_iterator : public std::iterator<std::bidirectional_iterator_tag, T, std::ptrdiff_t, const T*, const T&> {
@@ -113,17 +113,14 @@ class VectorList {
         int idx_list; 
     };
 
-    // метод, который будет использоваться для заполнения VectorList
-    // гарантирует, что в списке не будет пустых массивов
     template<class It>
     void append(It p, It q) {
         if (p != q)
             data_.push_back(VectT(p, q));
-    }  // определена снаружи
+    }
 
     bool empty() const { return size() == 0; }
 
-    // определите метод size
     size_t size() const {
         size_t n_elem = 0;
         for (const VectT &vec : data_) {
@@ -133,7 +130,6 @@ class VectorList {
         return n_elem;
     }
 
-    // определите методы begin / end
     const_iterator begin() const {
         if (!data_.empty()) {
             return const_iterator(&data_, data_.front().cbegin(), data_.cbegin(), 0, 0);
@@ -149,10 +145,8 @@ class VectorList {
         return const_iterator();
     }
 
-    // определите const_reverse_iterator
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-    // определите методы rbegin / rend
     const_reverse_iterator rbegin() const {
         if (!data_.empty()) {
             return  const_reverse_iterator(++const_iterator(&data_, --(data_.back().cend()), --(data_.cend()),
