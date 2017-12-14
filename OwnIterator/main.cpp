@@ -23,10 +23,9 @@ class VectorList {
 
     class const_iterator : public std::iterator<std::bidirectional_iterator_tag, T, std::ptrdiff_t, const T*, const T&> {
      public:
-        const_iterator(const ListT* data_, typename VectT::const_iterator VecIter,
-		       typename ListT::const_iterator ListIter, int idx_vec, int idx_list)
-	    : data_(data_), VecIter(VecIter), ListIter(ListIter), idx_vec(idx_vec), idx_list(idx_list) {
-	}
+        const_iterator(typename ListT::const_iterator listIter, int idx_vec, int idx_list, int size)
+	    : listIter(listIter), idx_vec(idx_vec), idx_list(idx_list), size(size) {
+        }
 
         const_iterator() = default;
 
@@ -37,7 +36,7 @@ class VectorList {
         const_iterator & operator=(const_iterator const &) = default;
 
         bool operator==(const const_iterator &other) const {
-            return (ListIter == other.ListIter) && (VecIter == other.VecIter);
+            return (listIter == other.listIter) && (idx_vec == other.idx_vec);
         }
 
         bool operator!=(const const_iterator &other) const {
@@ -45,10 +44,9 @@ class VectorList {
         }
 
         const_iterator& operator++() {
-            if (idx_list < data_->size()) {
-                if (idx_vec + 1 < ListIter->size()) {
+            if (idx_list < size) {
+                if (idx_vec + 1 < listIter->size()) {
                     ++idx_vec;
-                    ++VecIter;
                 } else {
                     increment_list();
                 }
@@ -61,8 +59,7 @@ class VectorList {
         void increment_list() {
             idx_vec = 0;
             ++idx_list;
-            ++ListIter;
-            VecIter = ListIter->cbegin();
+            ++listIter;
         }
  
         const_iterator operator++(int) {
@@ -74,19 +71,16 @@ class VectorList {
         const_iterator& operator--() {
             if (idx_vec > 0 || idx_list > 0) {
                 if (idx_vec - 1 < 0) {
-                    --ListIter;
+                    --listIter;
                     --idx_list;
-                    idx_vec = ListIter->size() - 1;
-                    VecIter = --(ListIter->cend());
+                    idx_vec = listIter->size() - 1;
                 } else {
                     --idx_vec;
-                    --VecIter;
                 }
             } else {
-                --ListIter;
+                --listIter;
                 --idx_list;
                 idx_vec = 0;
-                VecIter = ListIter->begin();
             }
             return *this;
         }
@@ -98,26 +92,25 @@ class VectorList {
         }
 
         const T& operator*() const {
-            return (*VecIter);
+            return (*listIter)[idx_vec];
         }
 
         const T* operator->() const {
-            return &(*VecIter);
+            return &(*listIter)[idx_vec];
         }
 
      private:
-        const ListT *data_;
-        typename VectT::const_iterator VecIter;
-        typename ListT::const_iterator ListIter;
+        typename ListT::const_iterator listIter;
         int idx_vec;
-        int idx_list; 
+        int idx_list;
+	int size;
     };
 
     template<class It>
     void append(It p, It q) {
         if (p != q)
             data_.push_back(VectT(p, q));
-    }
+    }  
 
     bool empty() const { return size() == 0; }
 
@@ -132,15 +125,14 @@ class VectorList {
 
     const_iterator begin() const {
         if (!data_.empty()) {
-            return const_iterator(&data_, data_.front().cbegin(), data_.cbegin(), 0, 0);
+            return const_iterator(data_.cbegin(), 0, 0, data_.size());
         }
         return const_iterator();
     }
     
     const_iterator end() const {
         if (!data_.empty()) {
-            return ++const_iterator(&data_, --(data_.back().cend()), --(data_.cend()),
-				    data_.back().size() - 1, data_.size() - 1);
+            return ++const_iterator(--(data_.cend()), data_.back().size() - 1, data_.size() - 1, data_.size());
         }
         return const_iterator();
     }
@@ -149,16 +141,15 @@ class VectorList {
 
     const_reverse_iterator rbegin() const {
         if (!data_.empty()) {
-            return  const_reverse_iterator(++const_iterator(&data_, --(data_.back().cend()), --(data_.cend()),
-							    data_.back().size() - 1, data_.size() - 1));
+            return  const_reverse_iterator(++const_iterator(--(data_.cend()), data_.back().size() - 1,
+                                                            data_.size() - 1, data_.size()));
         }
         return const_reverse_iterator(const_iterator());
     }
     
     const_reverse_iterator rend() const {
         if (!data_.empty()) {
-            return  const_reverse_iterator(const_iterator(&data_, data_.front().cbegin(),
-							  data_.cbegin(), 0, 0));
+            return  const_reverse_iterator(const_iterator(data_.cbegin(), 0, 0, data_.size()));
         }
         return const_reverse_iterator(const_iterator());
     }
