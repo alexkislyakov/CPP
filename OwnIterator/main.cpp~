@@ -1,0 +1,237 @@
+#include <iostream>
+#include <vector>
+#include <list>
+#include <iterator>
+
+template <typename ValueType>
+class Iterator : public std::iterator<std::bidirectional_iterator_tag, ValueType> {
+    
+private:
+    using VectT  = std::vector<ValueType>;
+    using ListT = std::list<VectT>;
+    
+public:
+
+    typedef Iterator self_type;
+    typedef const ValueType value_type;
+    typedef const ValueType& reference;
+    typedef ValueType* pointer;
+    typedef std::bidirectional_iterator_tag iterator_category;
+    typedef int difference_type;
+    
+    Iterator(const ValueType *p, const ListT *data_, int nList, int nVec) : p(p), data_(data_), nList(nList), nVec(nVec)
+    {}
+    
+    Iterator() = default;
+    
+    Iterator(const Iterator &other) = default;
+    
+    bool operator==(const Iterator &other) const {
+        return p == other.p;
+    }
+    
+    bool operator!=(const Iterator &other) const {
+        return !(p == other.p);
+    }
+    
+    Iterator& operator++() {
+        typename ListT::const_iterator itList = data_->begin();
+        advance(itList, nList);
+        typename VectT::const_iterator itVec = std::begin(*itList);
+        advance(itVec, nVec);
+        if (nVec + 1 < itList->size()) {
+            ++nVec;
+            p = &(*(++itVec));
+        } else {
+            ++nList;
+            nVec = 0;
+            ++itList;
+            itVec = std::begin(*itList);
+            p = &(*(itVec));
+        }
+        return *this;
+    }
+    
+    Iterator operator++(int junk) {
+        Iterator tmp = *this;
+        ++(*this);
+        return tmp;
+    }
+    
+    Iterator& operator--() {
+        typename ListT::const_iterator itList = data_->begin();
+        advance(itList, nList);
+        typename VectT::const_iterator itVec = std::begin(*itList);
+        advance(itVec, nVec);
+        if (nVec - 1 >= 0) {
+            --nVec;
+            p = &(*(--itVec));
+        } else {
+            --nList;
+            nVec = 0;
+            --itList;
+            itVec = std::begin(*itList);
+            p = &(*(itVec));
+        }
+        return *this;
+    }
+    
+    Iterator operator--(int junk) {
+        Iterator tmp = *this;
+        --(*this);
+        return tmp;
+    }
+    
+    const ValueType& operator*() const {
+        return *p;
+    }
+    
+    const ValueType* operator->() const {
+        return p;
+    }
+    
+private:
+    const ValueType *p = nullptr;
+    const ListT *data_ = nullptr;
+    int nList = 0;
+    int nVec = 0;
+};
+
+
+template<class T>
+class VectorList
+{
+private:
+    using VectT  = std::vector<T>;
+    using ListT = std::list<VectT>;
+    
+public:
+    using value_type = T;
+    
+    VectorList() = default;
+    VectorList(VectorList const &) = default;
+    VectorList(VectorList &&) = default;
+    
+    VectorList & operator=(VectorList &&)     = default;
+    VectorList & operator=(VectorList const &) = default;
+    
+    // метод, который будет использоваться для заполнения VectorList
+    // гарантирует, что в списке не будет пустых массивов
+    template<class It>
+    void append(It p, It q)
+    {
+	 if (p != q)
+         data_.push_back(VectT(p,q));
+    }// определена снаружи
+    
+    bool empty() const { return size() == 0; }
+    
+    // определите метод size
+    size_t size() const
+    {
+        size_t n_elem = 0;
+        for (auto vec : data_) {
+            n_elem += vec.size();
+        }
+        
+        return n_elem;
+    }
+    
+    // определите const_iterator
+    typedef Iterator<T> const_iterator;
+    
+    // определите методы begin / end
+    const_iterator begin() const {
+        if (!data_.empty()) {
+            return const_iterator(&(data_.front()).front(), &data_, 0, 0);
+        }
+        return const_iterator();
+    }
+    const_iterator end()   const {
+        if (!data_.empty()) {
+            return ++const_iterator(&(data_.back()).back(), &data_, data_.size(), data_.back().size());
+        }
+        return const_iterator();
+    }
+    
+    // определите const_reverse_iterator
+    typedef std::reverse_iterator<const_iterator> const_reverse_iterator ;
+    
+    // определите методы rbegin / rend
+    const_reverse_iterator rbegin() const {
+        if (!data_.empty()) {
+            return  const_reverse_iterator(const_iterator(&(data_.back()).back(), &data_, 0, 0));
+        }
+        return const_reverse_iterator(const_iterator());
+    }
+    const_reverse_iterator rend()   const {
+        if (!data_.empty()) {
+            return  const_reverse_iterator(++const_iterator(&(data_.front()).front(), &data_, data_.size(), data_.back().size()));
+        }
+        return const_reverse_iterator(const_iterator());
+    }
+    
+private:
+    ListT data_;
+};
+
+int main() {
+
+std::vector<std::string> v1 = {"one", "two", "three"};
+std::vector<std::string> v2 = {"four", "five", "six", "seven", "eight"};
+std::vector<std::string> v3 = {"nine", "ten", "eleven", "twelve"};
+std::vector<std::string> v4 = {};
+for (int k = 13; k <= 30; ++k) {
+   v4.push_back(std::to_string(k) + "-th");
+}
+VectorList<std::string> vl;
+std::cout << "empty distance = " << std::distance(vl.rbegin(), vl.rend()) << std::endl;
+
+vl.append(v1.begin(), v1.end());
+
+vl.append(v2.begin(), v2.end()); 
+
+vl.append(v3.begin(), v3.end());
+
+vl.append(v4.begin(), v4.end());
+
+VectorList<std::string>::const_iterator it = vl.begin();
+for (; it != vl.end(); ++it) {
+   std::string a = *it;
+   std::cout << a << " ";
+}
+std::cout << std::endl;
+std::cout << "distance = " << std::distance(vl.begin(), vl.end()) << std::endl;
+
+VectorList<std::string>::const_iterator eit = vl.end();
+for (; eit != vl.begin();) {
+    std::string a = *(--eit);
+    std::cout << a << " ";
+}
+std::cout << std::endl;
+
+VectorList<std::string>::const_reverse_iterator rit = vl.rend();
+for (; rit != vl.rend(); ++rit) {
+   std::string a = *rit;
+   std::cout << a << " ";
+}
+std::cout << std::endl;
+std::cout << "reverse distance = " << std::distance(vl.rbegin(), vl.rend()) << std::endl;
+
+VectorList<std::string>::const_reverse_iterator erit = vl.rend();
+for (; erit != vl.rbegin();) {
+   std::string a = *(--erit);
+   std::cout << a << " ";
+}
+std::cout << std::endl;
+
+VectorList<std::string>::const_iterator i = vl.rend().base();
+for (; i != vl.end(); ++i) {
+   std::string a = *i;
+   std::cout << a << " ";
+}
+
+std::cout << std::endl;
+    
+    return EXIT_SUCCESS;
+}
