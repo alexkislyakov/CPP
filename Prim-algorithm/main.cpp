@@ -30,14 +30,13 @@
 #include <tuple>
 
 class Graph {
- private:
-    std::vector<std::pair<int, int>> *adj;
+private:
+    std::vector<std::vector<std::pair<int, int>>> adj;
     int nodes;
     
-    
- public:
+public:
     explicit Graph(int n) : nodes(n) {
-        adj = new std::vector<std::pair<int, int>>[nodes];
+        adj.resize(nodes);
     }
     void Add_edge(int u, int v, int w) {
         adj[u].push_back(std::make_pair(v, w));

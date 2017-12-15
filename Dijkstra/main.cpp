@@ -26,14 +26,13 @@
 #include <utility>
 
 class Graph {
- private:
-    std::vector<std::pair<int, int>> *adj;
-    int n;
+private:
+    std::vector<std::vector<std::pair<int, int>>> adj;
+    int nNodes;
     
-    
- public:
-    explicit Graph(int nodes) : n(nodes) {
-        adj = new std::vector<std::pair<int, int>>[n];
+public:
+    explicit Graph(int nodes) : nNodes(nodes) {
+        adj.resize(nNodes);
     }
     
     void Add_edge(int u, int v, int w) {
@@ -43,8 +42,8 @@ class Graph {
     
     std::vector<int> Dijkstra(int start) {
         std::priority_queue<std::pair<int, int>> q;
-        std::vector<bool> processed(n, false);
-        std::vector<int> distance(n, static_cast<int>(10e6));
+        std::vector<bool> processed(nNodes, false);
+        std::vector<int> distance(nNodes, static_cast<int>(10e6));
         distance[start] = 0;
         q.push(std::make_pair(0, start));
         

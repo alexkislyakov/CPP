@@ -37,19 +37,18 @@
 #include <tuple>
 
 class Graph {
- private:
+private:
     std::vector<std::tuple<int, int, int>> adj;
     int *link;
     int *size;
-    int m;
-    int n;
+    int nEdges;
+    int nNodes;
     
-    
- public:
-    Graph(int a, int b) : m(a), n(b) {
-        link = new int[n];
-        size = new int[n];
-        for (int i = 1; i <= n; i++) {
+public:
+    Graph(int nEdges, int nNodes) : nEdges(nEdges), nNodes(nNodes) {
+        link = new int[nNodes];
+        size = new int[nNodes];
+        for (int i = 1; i <= nNodes; i++) {
             link[i] = i;
             size[i] = 1;
         }
@@ -66,7 +65,7 @@ class Graph {
     int Kruskal() {
         int sum = 0;
         this->Sort_edges();
-        for (int i = 0; i < m; i++) {
+        for (int i = 0; i < nEdges; i++) {
             if (!same(std::get<0>(adj[i]), std::get<1>(adj[i]))) {
                 unite(std::get<0>(adj[i]), std::get<1>(adj[i]));
                 sum += std::get<2>(adj[i]);
@@ -91,6 +90,11 @@ class Graph {
         }
         size[a] += size[b];
         link[b] = a;
+    }
+    
+    ~Graph() {
+        delete[] link;
+        delete[] size;
     }
 };
 

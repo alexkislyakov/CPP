@@ -29,22 +29,21 @@ Given q queries in the form of a graph and some
 #include <queue>
 
 class Graph {
- private:
+private:
     std::vector<std::vector<int>> adj;
-    int n;
+    size_t size;
     
-    
- public:
-    explicit Graph(int l) : n(l) {
-        adj.resize(l);
+public:
+    explicit Graph(size_t size) : size(size) {
+        adj.resize(size);
     }
     void Add_edge(int u, int v) {
         adj[u].push_back(v);
         adj[v].push_back(u);
     }
     std::vector<int> BFS(int start) {
-        std::vector<int> distances(n, -1);
-        std::vector<bool> visited(n, false);
+        std::vector<int> distances(size, -1);
+        std::vector<bool> visited(size, false);
         std::queue<int> q;
         
         visited[start] = true;
