@@ -127,14 +127,11 @@ public:
         if (!data_.empty()) {
             return const_iterator(data_.cbegin(), data_.size());
         }
-        return const_iterator();
+        return end();
     }
     
     const_iterator end() const {
-        if (!data_.empty()) {
-            return const_iterator((data_.cend()), data_.size(), data_.size());
-        }
-        return const_iterator();
+        return const_iterator((data_.cend()), data_.size(), data_.size());
     }
     
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
@@ -143,14 +140,11 @@ public:
         if (!data_.empty()) {
             return  const_reverse_iterator(const_iterator((data_.cend()), data_.size(), data_.size()));
         }
-        return const_reverse_iterator(const_iterator());
+        return rend();
     }
     
     const_reverse_iterator rend() const {
-        if (!data_.empty()) {
-            return  const_reverse_iterator(const_iterator(data_.cbegin(), data_.size()));
-        }
-        return const_reverse_iterator(const_iterator());
+        return  const_reverse_iterator(const_iterator(data_.cbegin(), data_.size()));
     }
     
 private:
@@ -199,4 +193,3 @@ int main() {
     
     return EXIT_SUCCESS;
 }
-
