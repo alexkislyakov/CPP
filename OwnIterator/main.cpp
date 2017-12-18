@@ -124,10 +124,7 @@ public:
     }
     
     const_iterator begin() const {
-        if (!data_.empty()) {
-            return const_iterator(data_.cbegin(), data_.size());
-        }
-        return end();
+        return const_iterator(data_.cbegin(), data_.size());
     }
     
     const_iterator end() const {
@@ -137,14 +134,11 @@ public:
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
     
     const_reverse_iterator rbegin() const {
-        if (!data_.empty()) {
-            return  const_reverse_iterator(const_iterator((data_.cend()), data_.size(), data_.size()));
-        }
-        return rend();
+        return const_reverse_iterator(const_iterator((data_.cend()), data_.size(), data_.size()));
     }
     
     const_reverse_iterator rend() const {
-        return  const_reverse_iterator(const_iterator(data_.cbegin(), data_.size()));
+        return const_reverse_iterator(const_iterator(data_.cbegin(), data_.size()));
     }
     
 private:
