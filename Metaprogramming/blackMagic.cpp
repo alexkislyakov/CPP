@@ -19,6 +19,7 @@ struct IntList<> {
 };
 
 // определите метафункцию Length для вычисления длины списка
+
 template<typename T>
 struct Length {
     static const int value = 1 + Length<typename T::Tail>::value;
@@ -58,6 +59,7 @@ struct Generate<0, D> {
 };
 
 //just checking in
+
 template<typename T>
 void check()
 {
@@ -79,6 +81,7 @@ auto apply(F f, const std::tuple<Args...> &t) -> decltype(apply(f, t, typename G
 }
 
 //бинарная метафункция Plus
+
 template<int a, int b>
 struct Plus
 {
@@ -86,6 +89,7 @@ struct Plus
 };
 
 //бинарная метафункция Minus
+
 template<int a, int b>
 struct Minus
 {
@@ -95,6 +99,7 @@ struct Minus
 //Напишите метафункцию Zip (аналог std::transform), которая принимает два списка целых чисел
 //одинаковой длины, а так же бинарную метафункцию,  и возвращает список, получившийся в результате
 //поэлементного применения метафункции к соответствующим  элементам исходных списков.
+
 template<typename L1, typename L2, template <int, int> class F>
 struct Zip {
     using type = typename IntCons<F<L1::Head, L2::Head>::value, typename Zip<typename L1::Tail,
@@ -117,7 +122,6 @@ private:
     double val = 0;
 public:
     Quantity() = default;
-    
     
     explicit Quantity(double val) : val(val)
     {}
@@ -184,31 +188,26 @@ int main()
     check<L3>();
     
     auto f = [](int x, double y, double z) { return x + y + z; };
-    auto t = std::make_tuple(30, 5.0, 1.6);  // std::tuple<int, double, double>
+    auto t = std::make_tuple(30, 5.0, 1.6); 
     auto res = apply(f, t);
     
     std::cout << res << std::endl;
     
-    // два списка одной длины
     using L1 = IntList<1,2,3,4,5>;
     using L2 = IntList<1,3,7,7,2>;
     
-    // результат применения — список с поэлементными суммами
     using L = Zip<L1, L2, Plus>::type;
     check<L>();
     
-    LengthQ   length{30000};      // 30 км
-    TimeQ     time{10 * 60};    // 10 минут
-    // вычисление скорости
-    VelocityQ v = length / time;// результат типа VelocityQ, 50 м/с
+    LengthQ   length{30000};
+    TimeQ     time{10 * 60};
+
+    VelocityQ v = length / time;
     std::cout << v.value() << std::endl;
     
-    AccelQ    a{9.8};        // ускорение свободного падения
-    MassQ     m{80};         // 80 кг
-    // сила притяжения, которая действует на тело массой 80 кг
+    AccelQ    a{9.8};
+    MassQ     m{80};
     ForceQ    force = m * a;
-    std::cout << force.value() << std::endl;
-    
     
     return EXIT_SUCCESS;
 }
