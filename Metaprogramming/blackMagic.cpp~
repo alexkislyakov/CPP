@@ -1,0 +1,92 @@
+#include <iostream>
+#include <tuple>
+
+template<int... Ints>
+struct IntList;
+
+template<int T, int... Ints>
+struct IntList<T, Ints...> {
+    static const int Head = T;
+    using Tail = IntList<Ints...>;
+};
+template<>
+struct IntList<> {
+};
+
+template<int T, typename... L>
+struct IntCons;
+
+template<int T, int... L>
+struct IntCons<T, IntList<L...>> {
+    using type = IntList<T, L...>;
+};
+
+template<int N, int D = 0>
+struct Generate {
+    using type = typename IntCons<D, typename Generate<N - 1, D + 1>::type>::type;
+};
+
+template<>
+struct Generate<0> {
+    using type = IntList<>;
+};
+
+template<int D>
+struct Generate<0, D> {
+    using type = IntList<>;
+};
+
+template<typename T>
+void check()
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+}
+
+template<typename F, typename... Args, int... I>
+auto apply(F f, const std::tuple<Args...> &t, IntList<I...>) -> decltype(f(std::get<I>(t)...)) {
+    return f(std::get<I>(t)...);
+}
+
+template<typename F, typename... Args>
+auto apply(F f, const std::tuple<Args...> &t) -> decltype(apply(f, t, typename Generate<sizeof...(Args)>::type())) {
+    return apply(f, t, typename Generate<sizeof...(Args)>::type());
+}
+
+//бинарная метафункция
+template<int a, int b>
+struct Plus
+{
+    static int const value = a + b;
+};
+
+template<typename L1, typename L2, template <int, int> class F>
+struct Zip {
+    using type = typename IntCons<F<L1::Head, L2::Head>::value, typename Zip<typename L1::Tail, typename L2::Tail, F>::type>::type;
+};
+
+template<template <int, int> class F>
+struct Zip<IntList<>, IntList<>, F> {
+    using type = IntList<>;
+};
+
+int main()
+{
+    using L3 = Generate<5>::type;
+    check<L3>();
+    
+    auto f = [](int x, double y, double z) { return x + y + z; };
+    auto t = std::make_tuple(30, 5.0, 1.6); 
+    auto res = apply(f, t);
+    
+    std::cout << res << std::endl;
+
+    // два списка одной длины
+    using L1 = IntList<1,2,3,4,5>;
+    using L2 = IntList<1,3,7,7,2>;
+    
+    // результат применения — список с поэлементными суммами
+    using L = Zip<L1, L2, Plus>::type;
+    check<L>();
+    
+    return EXIT_SUCCESS;
+}
