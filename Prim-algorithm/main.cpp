@@ -19,7 +19,7 @@
  One specific node S is fixed as the starting point of finding
  the subgraph.
  Find the total weight of such a subgraph (sum of all edges in
- the subgraph)
+ the subgraph).
 */
 
 #include <vector>
